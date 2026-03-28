@@ -15,6 +15,7 @@ def interpolate_latent_space(generator, latent_dim, num_points=100, device='cpu'
         # Generate data from the interpolated latent points
         interpolated_data = generator(interpolated_z).cpu().numpy()
     
+    # Each interpolated point produces (seq_len, 3); flatten segments into trajectory
     return interpolated_data.reshape(-1, 3)
 
 # Usage:

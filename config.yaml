@@ -1,7 +1,7 @@
 # Global simulation parameters
 global:
-  default_sim_time: 50
-  default_sim_steps: 2500
+  default_sim_time: 33
+  default_sim_steps: 9999
 
 systems:
   Lorenz:
@@ -17,6 +17,11 @@ systems:
       rho:
         type: uniform
         range: [20, 30]
+    bifurcation_param:
+      name: rho
+      start: 0
+      stop: 50
+      num: 200
 
   Aizawa:
     func: aizawa_system
@@ -54,36 +59,6 @@ systems:
         type: uniform
         range: [0.05, 0.25]
 
-  # Three-Scroll:
-  #   func: three_scroll_system
-  #   scale: 20.0
-  #   sim_time: 50  # Override global default
-  #   sim_steps: 5000  # Override global default
-  #   params:
-  #     a:
-  #       type: uniform
-  #       range: [32, 48]
-  #     b:
-  #       type: uniform
-  #       range: [45, 65]
-  #     c:
-  #       type: uniform
-  #       range: [1.5, 2.2]
-
-  # Rossler:
-  #   func: rossler_system
-  #   scale: 10.0
-  #   params:
-  #     a:
-  #       type: uniform
-  #       range: [0.1, 0.3]
-  #     b:
-  #       type: uniform
-  #       range: [0.1, 0.3]
-  #     c:
-  #       type: uniform
-  #       range: [5.0, 6.0]
-
   Chen:
     func: chen_system
     scale: 20.0
@@ -106,70 +81,6 @@ systems:
         type: uniform
         range: [1.2, 1.4]
 
-  # Anishchenko:
-  #   func: anishchenko_system
-  #   scale: 10.0
-  #   params:
-  #     a:
-  #       type: uniform
-  #       range: [0.1, 0.3]
-  #     b:
-  #       type: uniform
-  #       range: [0.2, 0.4]
-  #     c:
-  #       type: uniform
-  #       range: [1.0, 1.5]
-
-  # Arnold:
-  #   func: arnold_system
-  #   scale: 1.0
-  #   params:
-  #     omega:
-  #       type: uniform
-  #       range: [0.5, 1.5]
-
-  # Burke-Shaw:
-  #   func: burke_shaw_system
-  #   scale: 10.0
-  #   params:
-  #     a:
-  #       type: uniform
-  #       range: [10, 11]
-  #     b:
-  #       type: uniform
-  #       range: [4, 4.5]
-  #     c:
-  #       type: uniform
-  #       range: [2, 2.5]
-
-  # Chen-Celikovsky:
-  #   func: chen_celikovsky_system
-  #   scale: 20.0
-  #   params:
-  #     a:
-  #       type: uniform
-  #       range: [35, 36]
-  #     c:
-  #       type: uniform
-  #       range: [20, 21]
-  #     d:
-  #       type: uniform
-  #       range: [1, 2]
-
-  # Finance:
-  #   func: finance_system
-  #   scale: 1.0
-  #   params:
-  #     a:
-  #       type: uniform
-  #       range: [0.8, 1.0]
-  #     b:
-  #       type: uniform
-  #       range: [0.1, 0.2]
-  #     c:
-  #       type: uniform
-  #       range: [0.8, 1.0]
-
   Newton-Leipnik:
     func: newton_leipnik_system
     scale: 0.5
@@ -181,64 +92,183 @@ systems:
         type: uniform
         range: [0.35, 0.45]
 
-  # Qi-Chen:
-  #   func: qi_chen_system
-  #   scale: 15.0
-  #   params:
-  #     a:
-  #       type: uniform
-  #       range: [35, 40]
-  #     b:
-  #       type: uniform
-  #       range: [3, 3.5]
-  #     c:
-  #       type: uniform
-  #       range: [20, 28]
+  Three-Scroll:
+    func: three_scroll_system
+    scale: 20.0
+    sim_time: 50
+    sim_steps: 5000
+    params:
+      a:
+        type: uniform
+        range: [32, 48]
+      b:
+        type: uniform
+        range: [45, 65]
+      c:
+        type: uniform
+        range: [1.5, 2.2]
 
-  # Rayleigh-Benard:
-  #   func: rayleigh_benard_system
-  #   scale: 10.0
-  #   params:
-  #     a:
-  #       type: uniform
-  #       range: [9, 10]
-  #     b:
-  #       type: uniform
-  #       range: [5, 6]
-  #     c:
-  #       type: uniform
-  #       range: [12, 13]
+  Rossler:
+    func: rossler_system
+    scale: 10.0
+    params:
+      a:
+        type: uniform
+        range: [0.1, 0.3]
+      b:
+        type: uniform
+        range: [0.1, 0.3]
+      c:
+        type: uniform
+        range: [5.0, 6.0]
 
-  # TSUCS1:
-  #   func: tsucs1_system
-  #   scale: 1.0
-  #   params:
-  #     a:
-  #       type: uniform
-  #       range: [40, 41]
-  #     b:
-  #       type: uniform
-  #       range: [0.7, 0.8]
-  #     c:
-  #       type: uniform
-  #       range: [0.6, 0.7]
+  Anishchenko:
+    func: anishchenko_system
+    scale: 10.0
+    params:
+      a:
+        type: uniform
+        range: [0.1, 0.3]
+      b:
+        type: uniform
+        range: [0.2, 0.4]
+      c:
+        type: uniform
+        range: [1.0, 1.5]
 
-  # Liu-Chen:
-  #   func: liu_chen_system
-  #   scale: 20.0
-  #   params:
-  #     a:
-  #       type: uniform
-  #       range: [35, 36]
-  #     b:
-  #       type: uniform
-  #       range: [3, 3.5]
-  #     c:
-  #       type: uniform
-  #       range: [20, 28]
-  #     d:
-  #       type: uniform
-  #       range: [1, 2]
+  Arnold:
+    func: arnold_system
+    scale: 1.0
+    params:
+      omega:
+        type: uniform
+        range: [0.5, 1.5]
+
+  Burke-Shaw:
+    func: burke_shaw_system
+    scale: 10.0
+    params:
+      a:
+        type: uniform
+        range: [10, 11]
+      b:
+        type: uniform
+        range: [4, 4.5]
+      c:
+        type: uniform
+        range: [2, 2.5]
+
+  Chen-Celikovsky:
+    func: chen_celikovsky_system
+    scale: 20.0
+    params:
+      a:
+        type: uniform
+        range: [35, 36]
+      c:
+        type: uniform
+        range: [20, 21]
+      d:
+        type: uniform
+        range: [1, 2]
+
+  Finance:
+    func: finance_system
+    scale: 1.0
+    params:
+      a:
+        type: uniform
+        range: [0.8, 1.0]
+      b:
+        type: uniform
+        range: [0.1, 0.2]
+      c:
+        type: uniform
+        range: [0.8, 1.0]
+
+  Qi-Chen:
+    func: qi_chen_system
+    scale: 15.0
+    params:
+      a:
+        type: uniform
+        range: [35, 40]
+      b:
+        type: uniform
+        range: [3, 3.5]
+      c:
+        type: uniform
+        range: [20, 28]
+
+  Rayleigh-Benard:
+    func: rayleigh_benard_system
+    scale: 10.0
+    params:
+      a:
+        type: uniform
+        range: [9, 10]
+      b:
+        type: uniform
+        range: [5, 6]
+      c:
+        type: uniform
+        range: [12, 13]
+
+  TSUCS1:
+    func: tsucs1_system
+    scale: 1.0
+    params:
+      a:
+        type: uniform
+        range: [40, 41]
+      b:
+        type: uniform
+        range: [0.7, 0.8]
+      c:
+        type: uniform
+        range: [0.6, 0.7]
+
+  Liu-Chen:
+    func: liu_chen_system
+    scale: 20.0
+    params:
+      a:
+        type: uniform
+        range: [35, 36]
+      b:
+        type: uniform
+        range: [3, 3.5]
+      c:
+        type: uniform
+        range: [20, 28]
+      d:
+        type: uniform
+        range: [1, 2]
+
+  Henon:
+    func: henon_map
+    type: map
+    scale: 1.0
+    n_iterations: 10000
+    transient: 1000
+    params:
+      a:
+        type: uniform
+        range: [1.2, 1.4]
+      b:
+        type: uniform
+        range: [0.2, 0.4]
+
+  Ikeda:
+    func: ikeda_map
+    type: map
+    scale: 1.0
+    n_iterations: 10000
+    transient: 1000
+    params:
+      u:
+        type: uniform
+        range: [0.8, 0.95]
 
 sim_params:
   method: RK45
@@ -249,3 +279,4 @@ gan_params:
   latent_dim: 100
   batch_size: 64
   num_epochs: 50
+  seq_len: 64

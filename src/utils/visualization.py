@@ -389,16 +389,38 @@ def plot_poincare_section(name: str, data: np.ndarray, output_dir: str, plane: s
     save_png(fig, f"{name}_poincare_section_{plane}", output_dir)
     plt.close(fig)
 
-def plot_bifurcation(name: str, system_func: callable, param_range: np.ndarray, param_name: str, output_dir: str) -> None:
+def plot_bifurcation(name: str, system_func: callable, param_range: np.ndarray, param_name: str, output_dir: str, base_params: dict = None) -> None:
     """Plot bifurcation diagram for a given parameter."""
+    from scipy.integrate import solve_ivp
+    from scipy.signal import argrelmax
+
     logger.info(f"Plotting bifurcation diagram for attractor: {name}")
 
     results = []
     for param in param_range:
-        params = {param_name: param}
-        trajectory = system_func(np.random.rand(3), np.linspace(0, 100, 1000), params)
-        scaled_trajectory = min_max_scale(trajectory)
-        results.extend([(param, x) for x in scaled_trajectory[500:, 0]])  # Use x-coordinate and discard transients
+        full_params = dict(base_params) if base_params else {}
+        full_params[param_name] = param
+        try:
+            sol = solve_ivp(
+                lambda t, y: system_func(y, t, full_params),
+                (0, 100), np.random.randn(3) * 0.1,
+                method='RK45', t_eval=np.linspace(0, 100, 2000),
+                rtol=1e-6, atol=1e-9,
+            )
+            if sol.success:
+                trajectory = sol.y.T
+                # Discard transient (first half)
+                steady = trajectory[len(trajectory) // 2:, 0]
+                # Find local maxima for bifurcation
+                maxima_idx = argrelmax(steady, order=5)[0]
+                if len(maxima_idx) > 0:
+                    results.extend([(param, steady[i]) for i in maxima_idx[-50:]])
+        except Exception:
+            continue
+
+    if not results:
+        logger.warning(f"No bifurcation data collected for {name}")
+        return
 
     results = np.array(results)
 
@@ -406,8 +428,7 @@ def plot_bifurcation(name: str, system_func: callable, param_range: np.ndarray, 
     ax.plot(results[:, 0], results[:, 1], ',k', alpha=0.1, markersize=0.1)
     ax.set_title(f'{name} Attractor Bifurcation Diagram', fontsize=16)
     ax.set_xlabel(param_name, fontsize=12)
-    ax.set_ylabel('x (scaled)', fontsize=12)
-    ax.set_ylim(0, 1)
+    ax.set_ylabel('x (local maxima)', fontsize=12)
     remove_top_right_axes(ax)
 
     plt.tight_layout()
@@ -455,4 +476,62 @@ def plot_power_spectrum(name: str, data: np.ndarray, output_dir: str) -> None:
 
     plt.tight_layout()
     save_png(fig, f"{name}_power_spectrum", output_dir)
+    plt.close(fig)
+
+
+def plot_parameter_heatmap(sweep_results: list, system_name: str, output_dir: str) -> None:
+    """Plot parameter sweep results as a scatter colored by classification."""
+    logger.info(f"Creating parameter heatmap for {system_name}")
+
+    # Collect param values and classifications
+    valid = [r for r in sweep_results if r['data'] is not None]
+    if len(valid) < 2:
+        logger.warning(f"Not enough valid results for heatmap ({len(valid)})")
+        return
+
+    # Find the two most-varied parameters
+    skip_keys = {'sim_time', 'sim_steps', 'scale'}
+    param_names = [k for k in valid[0]['params'] if k not in skip_keys
+                   and isinstance(valid[0]['params'][k], (int, float))]
+
+    if len(param_names) < 2:
+        logger.warning("Need at least 2 parameters for heatmap")
+        return
+
+    # Compute variance for each param to find most-varied pair
+    param_arrays = {k: np.array([r['params'].get(k, 0) for r in valid]) for k in param_names}
+    param_vars = {k: np.var(v) for k, v in param_arrays.items() if np.var(v) > 0}
+    sorted_params = sorted(param_vars, key=param_vars.get, reverse=True)
+
+    if len(sorted_params) < 2:
+        logger.warning("Not enough varying parameters for heatmap")
+        return
+
+    px, py = sorted_params[0], sorted_params[1]
+    x_vals = param_arrays[px]
+    y_vals = param_arrays[py]
+
+    color_map = {
+        'strange_attractor': 'green',
+        'limit_cycle': 'blue',
+        'fixed_point': 'gray',
+        'divergent': 'red',
+        'failed': 'black',
+    }
+    colors = [color_map.get(r['classification'], 'black') for r in valid]
+
+    fig, ax = plt.subplots(figsize=(10, 8))
+    for cls, color in color_map.items():
+        mask = [c == color for c in colors]
+        if any(mask):
+            ax.scatter(x_vals[mask], y_vals[mask], c=color, label=cls, s=30, alpha=0.7)
+
+    ax.set_xlabel(px, fontsize=12)
+    ax.set_ylabel(py, fontsize=12)
+    ax.set_title(f'{system_name} Parameter Sweep', fontsize=16)
+    ax.legend()
+    remove_top_right_axes(ax)
+
+    plt.tight_layout()
+    save_png(fig, f"{system_name}_parameter_heatmap", output_dir)
     plt.close(fig)
